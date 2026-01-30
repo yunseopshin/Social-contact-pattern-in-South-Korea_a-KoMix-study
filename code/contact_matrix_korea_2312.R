@@ -1,10 +1,10 @@
-setwd('C:/Users/Hwichang Jeong/Desktop/corona_정리/corona/Kstat_contact_matrix/Kstat')
-data= read.csv('Kstat 코로나19 이후 접촉도 변화 조사_6차(23년 11월)_Data.csv',fileEncoding = "euc-kr")
+setwd('C:/project/Social-contact-pattern-in-South-Korea-a-KoMix-study/data/Survey on Changes in Contact Patterns After COVID-19 (23.11)')
+data= read.csv('Data(2311).csv',fileEncoding = "utf-8")
 library(stringr)
-
+library(dplyr)
 
 colnames(data)
-contact_num_index = seq(from=33,length=50,by=6) # maximum 50
+contact_num_index = 8:57 # Age group columns (Q8A_1_1 to Q8A_50_1): 50 columns
 
 
 #############################################################################
@@ -12,9 +12,9 @@ contact_num_index = seq(from=33,length=50,by=6) # maximum 50
 data$Q3A[is.na(data$Q3A)]=0
 
 # Age, Weekday/Weekend, Number of contact, Age group of contactees, Mask time, Influenza vaccinated, Infected COVID-19, The number of COVID-19 vaccinated
-contact_data = data[,c(6,10,31,contact_num_index,25,29,22,24)]
+# New column positions: SQ2(1), SQ5AA(2), Q8(7), Q8A_1_1~Q8A_50_1(8-57), Q4(5), Q7(6), Q2(3), Q3A(4)
+contact_data = data[,c(1,2,7,contact_num_index,5,6,3,4)]
 contact_data[is.na(contact_data)]=0
-contact_data
 
 
 
@@ -59,7 +59,7 @@ phi_no_covid_vaccine_weekend = matrix(0,nrow=10,ncol=10)
 ################################
 # Age group of contact matrix
 age=c(0,3,7,13,16,19,30,40,50,60)
-contact_data
+head(contact_data)
 #############################################################################################################################
 # Construct contact matrix
 contact_week = contact_data %>% filter(SQ5AA==5)
@@ -256,18 +256,6 @@ for( i in 1:10){
     }
   }
 }
-######################
-# Ibuka contact matrix
-phi
-phi_mask_low
-phi_mask_high
-phi_flu_vaccine
-phi_no_flu_vaccine
-phi_covid_infect
-phi_no_covid_infect
-phi_covid_vaccine
-phi_no_covid_vaccine
-######################
 
 ########################################################################################################
 # Sebastian contact matrix
@@ -285,7 +273,7 @@ phi_no_covid_vaccine_res = (5/7) * phi_no_covid_vaccine_week + (2/7) * phi_no_co
 
 #2. Load Korea population structure
 n= rep(0,10)
-setwd('C:/Users/Hwichang Jeong/Desktop/corona_정리/corona/GIT - 복사본/KOREA')
+setwd('C:/project/Social-contact-pattern-in-South-Korea-a-KoMix-study/data')
 skage = read.csv('skage.csv',header=T)
 skage = skage[1:101,5]
 skage = as.numeric(sapply(skage, function(x) gsub(',','',x)))
@@ -338,11 +326,11 @@ phi_mask_high = as.data.frame(phi_mask_high)
 rownames(phi_mask_high) = name
 colnames(phi_mask_high) = name
 
-phi_vaccine = as.data.frame(phi_vaccine)
+phi_flu_vaccine = as.data.frame(phi_flu_vaccine)
 rownames(phi_flu_vaccine) = name
 colnames(phi_flu_vaccine) = name
 
-phi_no_vaccine = as.data.frame(phi_no_vaccine)
+phi_no_flu_vaccine = as.data.frame(phi_no_flu_vaccine)
 rownames(phi_no_flu_vaccine) = name
 colnames(phi_no_flu_vaccine) = name
 
@@ -399,26 +387,17 @@ phi_res_sb_no_covid_vaccine = as.data.frame(phi_res_sb_no_covid_vaccine)
 rownames(phi_res_sb_no_covid_vaccine) = name
 colnames(phi_res_sb_no_covid_vaccine) = name
 
-setwd('C:/Users/Hwichang Jeong/Desktop/corona_정리/corona/Kstat_contact_matrix/Kstat')
-write.csv(phi,'./contact matrix/IBUKA/2023/contact_2311_IBUKA.csv')
-write.csv(phi_mask_low,'./contact matrix/IBUKA/2023/contact_2311_IBUKA_mask_low.csv')
-write.csv(phi_mask_high,'./contact matrix/IBUKA/2023/contact_2311_IBUKA_mask_high.csv')
-write.csv(phi_vaccine,'./contact matrix/IBUKA/2023/contact_2311_IBUKA_flu_vaccine.csv')
-write.csv(phi_no_vaccine,'./contact matrix/IBUKA/2023/contact_2311_IBUKA_no_flu_vaccine.csv')
-write.csv(phi_covid_infect,'./contact matrix/IBUKA/2023/contact_2311_IBUKA_covid_infect.csv')
-write.csv(phi_no_covid_infect,'./contact matrix/IBUKA/2023/contact_2311_IBUKA_no_covid_infect.csv')
-write.csv(phi_covid_vaccine,'./contact matrix/IBUKA/2023/contact_2311_IBUKA_covid_vaccine.csv')
-write.csv(phi_no_covid_vaccine,'./contact matrix/IBUKA/2023/contact_2311_IBUKA_no_covid_vaccine.csv')
+setwd('C:/project/Social-contact-pattern-in-South-Korea-a-KoMix-study')
 
 
-write.csv(phi_res_sb,'./contact matrix/Sebastian/2023/contact_2311_Sebastian.csv')
-write.csv(phi_res_sb_mask_low,'./contact matrix/Sebastian/2023/contact_2311_Sebastian_mask_low.csv')
-write.csv(phi_res_sb_mask_high,'./contact matrix/Sebastian/2023/contact_2311_Sebastian_mask_high.csv')
-write.csv(phi_res_sb_flu_vaccine,'./contact matrix/Sebastian/2023/contact_2311_Sebastian_flu_vaccine.csv')
-write.csv(phi_res_sb_no_flu_vaccine,'./contact matrix/Sebastian/2023/contact_2311_Sebastian_no_flu_vaccine.csv')
-write.csv(phi_res_sb_covid_infect,'./contact matrix/Sebastian/2023/contact_2311_Sebastian_covid_infect.csv')
-write.csv(phi_res_sb_no_covid_infect,'./contact matrix/Sebastian/2023/contact_2311_Sebastian_no_covid_infect.csv')
-write.csv(phi_res_sb_covid_vaccine,'./contact matrix/Sebastian/2023/contact_2311_Sebastian_covid_vaccine.csv')
-write.csv(phi_res_sb_no_covid_vaccine,'./contact matrix/Sebastian/2023/contact_2311_Sebastian_no_covid_vaccine.csv')
+write.csv(phi_res_sb,'./contact matrix/contact_2311_Sebastian.csv')
+write.csv(phi_res_sb_mask_low,'./contact matrix/contact_2311_Sebastian_mask_low.csv')
+write.csv(phi_res_sb_mask_high,'./contact matrix/contact_2311_Sebastian_mask_high.csv')
+write.csv(phi_res_sb_flu_vaccine,'./contact matrix/contact_2311_Sebastian_flu_vaccine.csv')
+write.csv(phi_res_sb_no_flu_vaccine,'./contact matrix/contact_2311_Sebastian_no_flu_vaccine.csv')
+write.csv(phi_res_sb_covid_infect,'./contact matrix/contact_2311_Sebastian_covid_infect.csv')
+write.csv(phi_res_sb_no_covid_infect,'./contact matrix/contact_2311_Sebastian_no_covid_infect.csv')
+write.csv(phi_res_sb_covid_vaccine,'./contact matrix/contact_2311_Sebastian_covid_vaccine.csv')
+write.csv(phi_res_sb_no_covid_vaccine,'./contact matrix/contact_2311_Sebastian_no_covid_vaccine.csv')
 
 
